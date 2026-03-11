@@ -775,5 +775,29 @@
     
     
     
-</body>
+<script>
+(function() {
+  function addBadge() {
+    var rows = document.querySelectorAll('.framer-107sz0g');
+    rows.forEach(function(row) {
+      if (row.querySelector('.lyqx-badge')) return;
+      var el = document.createElement('div');
+      el.className = 'lyqx-badge';
+      el.style.cssText = 'flex:none;width:143px;height:143px;position:relative;overflow:visible;';
+      el.innerHTML = '<img decoding="async" width="236" height="236" src="images/top-app-badge.svg" alt="Top App Development Company" style="display:block;width:100%;height:100%;object-fit:contain;">';
+      row.appendChild(el);
+    });
+  }
+  window.addEventListener('load', function() {
+    addBadge();
+    var timer = setInterval(function() {
+      var rows = document.querySelectorAll('.framer-107sz0g');
+      var missing = false;
+      rows.forEach(function(r) { if (!r.querySelector('.lyqx-badge')) missing = true; });
+      if (missing) addBadge();
+    }, 200);
+    setTimeout(function() { clearInterval(timer); addBadge(); }, 4000);
+  });
+})();
+</script></body>
 </html>
