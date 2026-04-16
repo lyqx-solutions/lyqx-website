@@ -799,5 +799,29 @@
     setTimeout(function() { clearInterval(timer); addBadge(); }, 4000);
   });
 })();
+</script><script>
+(function() {
+  function addLocation() {
+    var blocks = document.querySelectorAll('.framer-1ck52s7');
+    blocks.forEach(function(block) {
+      if (block.querySelector('.lyqx-location')) return;
+      var el = document.createElement('div');
+      el.className = 'lyqx-location';
+      el.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:16px;';
+      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;">Rua Augusta 110, Lisbon, 1100-053, Portugal.</span>';
+      block.parentNode.insertBefore(el, block.nextSibling);
+    });
+  }
+  window.addEventListener('load', function() {
+    addLocation();
+    var timer = setInterval(function() {
+      var blocks = document.querySelectorAll('.framer-1ck52s7');
+      var missing = false;
+      blocks.forEach(function(b) { if (!b.querySelector('.lyqx-location') && !b.nextSibling?.classList?.contains('lyqx-location')) missing = true; });
+      if (missing) addLocation();
+    }, 200);
+    setTimeout(function() { clearInterval(timer); addLocation(); }, 4000);
+  });
+})();
 </script></body>
 </html>
