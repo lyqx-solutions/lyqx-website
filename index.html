@@ -798,42 +798,45 @@
 })();
 </script>
 <script>
-// Fix: Industries tab in mobile burger menu opens on hover (touch = hover on mobile).
-// Convert to press-only by blocking synthesized mouse events from touch and
-// replacing with an explicit click that Framer's React handler processes.
 (function() {
-  // Only apply on touch / coarse-pointer devices (not desktop mice)
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
+  // Kill the Industries label bounce caused by Framer's hover transform animation
+  var s = document.createElement('style');
+  s.textContent = '.framer-mlxrdn .framer-1vka2lr{transition:none!important;transform:none!important}';
+  document.head.appendChild(s);
+
   function patch(el) {
-    if (el._hoverFixed) return;
-    el._hoverFixed = true;
+    if (el._fixed) return;
+    el._fixed = true;
+
+    // Block ALL hover-family events (mouse + pointer) before they bubble to React's root listener.
+    // Original fix missed pointerover/pointerenter which Framer also uses — that's why toggle broke.
+    ['mouseover','mouseout','mouseenter','mouseleave',
+     'pointerover','pointerout','pointerenter','pointerleave'].forEach(function(t) {
+      el.addEventListener(t, function(e) { e.stopPropagation(); });
+    });
+
+    // On tap: prevent browser's synthesised hover chain, fire a clean click to toggle
     var moved = false;
     el.addEventListener('touchstart', function() { moved = false; }, {passive: true});
     el.addEventListener('touchmove',  function() { moved = true;  }, {passive: true});
     el.addEventListener('touchend', function(e) {
       if (moved) return;
-      // Prevent browser from synthesising mouseover/mouseenter after touchend
       e.preventDefault();
-      // Dispatch a real click so Framer toggles the dropdown via its own handler
       el.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
     }, {passive: false});
-    // Block any remaining synthesised hover events from reaching React's root listener
-    el.addEventListener('mouseover', function(e) { e.stopPropagation(); });
-    el.addEventListener('mouseout',  function(e) { e.stopPropagation(); });
   }
 
-  // Watch for the mobile nav to be mounted by Framer React
-  var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(node) {
-        if (node.nodeType !== 1) return;
-        node.querySelectorAll('.framer-mlxrdn').forEach(patch);
-        if (node.classList.contains('framer-mlxrdn')) patch(node);
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.addedNodes.forEach(function(n) {
+        if (n.nodeType !== 1) return;
+        n.querySelectorAll('.framer-mlxrdn').forEach(patch);
+        if (n.classList.contains('framer-mlxrdn')) patch(n);
       });
     });
-  });
-  observer.observe(document.body, {childList: true, subtree: true});
+  }).observe(document.body, {childList: true, subtree: true});
 })();
 </script>
 <script>(function() {
