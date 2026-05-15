@@ -923,5 +923,22 @@
     patchAll();
   }
 })();
+</script>
+<script>
+(function() {
+  var TWO_LINE = 'M4 8h16M4 16h16';
+  var THREE_LINE = 'M4 6h16M4 12h16M4 18h16';
+  function patchHamburger(root) {
+    (root.querySelectorAll ? root.querySelectorAll('path') : []).forEach(function(p) {
+      if (p.getAttribute('d') === TWO_LINE) p.setAttribute('d', THREE_LINE);
+    });
+  }
+  var mo = new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.addedNodes.forEach(function(n) { if (n.nodeType === 1) patchHamburger(n); });
+    });
+  });
+  mo.observe(document.body, {childList: true, subtree: true});
+})();
 </script></body>
 </html>
