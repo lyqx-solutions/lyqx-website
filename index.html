@@ -14,6 +14,7 @@
     <meta name="generator" content="Framer 02004a2">
     <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
     <link rel="preload" as="image" media="(min-width: 810px)" href="/images/bg-hero-1100.webp" imagesrcset="/images/bg-hero-480.webp 480w, /images/bg-hero-768.webp 768w, /images/bg-hero-1100.webp 1100w" imagesizes="(min-width: 1440px) 549px, (min-width: 810px) 344px, 100vw">
+    <script>(function(){var v=sessionStorage.getItem('lx');sessionStorage.setItem('lx','1');if(!v)return;var oa=Element.prototype.animate;Element.prototype.animate=function(kf,opts){if(kf&&!Array.isArray(kf)&&kf.transform){kf=Object.assign({},kf,{transform:['none','none']});}return oa.call(this,kf,opts);};var s=document.createElement('style');s.textContent='[data-framer-appear-id]{transform:none!important}';document.head.appendChild(s);})();</script>
     <title>LYQX — Mobile Design &amp; Development </title>
     <meta name="description" content="LYQX is a full-cycle digital company that builds powerful B2B and B2C products. We design and develop mobile apps, web platforms, and integrate AI solutions that drive growth and deliver real business value.">
     <meta name="framer-search-index" content="https://framerusercontent.com/sites/XFKUn6dMjQgfDxIr0mq1J/searchIndex-Q8F4Zmas1vuh.json">
@@ -790,20 +791,9 @@
       row.appendChild(el);
     });
   }
-  function addLocation() {
-    var blocks = document.querySelectorAll('.framer-1ck52s7');
-    blocks.forEach(function(block) {
-      if (block.querySelector('.lyqx-location')) return;
-      var el = document.createElement('div');
-      el.className = 'lyqx-location';
-      el.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:16px;';
-      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;">Rua Augusta 110, Lisbon, 1100-053, Portugal.</span>';
-      block.parentNode.insertBefore(el, block.nextSibling);
-    });
-  }
   // 3s delay: waits past React/Framer hydration so injected elements aren't removed by re-render
   window.addEventListener('load', function() {
-    setTimeout(function() { addBadge(); addLocation(); }, 3000);
+    setTimeout(function() { addBadge(); }, 3000);
   });
 })();
 </script>
