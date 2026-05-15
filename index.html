@@ -940,5 +940,32 @@
   });
   mo.observe(document.body, {childList: true, subtree: true});
 })();
+</script>
+<script>
+(function() {
+  var ORDER = ['Services', 'Projects', 'Industries'];
+  function reorder(nav) {
+    var children = Array.from(nav.children);
+    if (children.length < 2) return;
+    var sorted = children.slice().sort(function(a, b) {
+      var ai = ORDER.indexOf((a.textContent || '').trim().split('\n')[0].trim());
+      var bi = ORDER.indexOf((b.textContent || '').trim().split('\n')[0].trim());
+      if (ai === -1) ai = 999;
+      if (bi === -1) bi = 999;
+      return ai - bi;
+    });
+    sorted.forEach(function(el) { nav.appendChild(el); });
+  }
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.addedNodes.forEach(function(n) {
+        if (n.nodeType !== 1) return;
+        var nav = n.classList && n.classList.contains('framer-stp9rp') ? n
+                : n.querySelector && n.querySelector('.framer-stp9rp');
+        if (nav) reorder(nav);
+      });
+    });
+  }).observe(document.body, {childList: true, subtree: true});
+})();
 </script></body>
 </html>
