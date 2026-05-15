@@ -946,97 +946,40 @@
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
   var ORDER = ['Services', 'Projects', 'Industries'];
-  var allowed = new WeakSet();
-
-  // Block all hover events for mobile nav items at document capture —
-  // before React's root listener can process them.
-  ['pointerenter','pointerleave','mouseover','mouseout','mouseenter','mouseleave'].forEach(function(t) {
-    document.addEventListener(t, function(e) {
-      if (allowed.has(e)) return;
-      if (e.target && e.target.closest && e.target.closest('.lyqx-nav-item')) {
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
-    }, true);
-  });
-
-  function fire(el, type) {
-    var e = new PointerEvent(type, {bubbles: false, cancelable: false, composed: true, pointerId: 1, pointerType: 'mouse'});
-    allowed.add(e);
-    el.dispatchEvent(e);
-  }
-
-  // Detect open state by checking if chevron is rotated
-  function isOpen(el) {
-    return !!el.querySelector('[style*="rotate(-180"]');
-  }
+  var ordered = false;
 
   function getText(el) {
     var p = el.querySelector('p');
-    return (p ? p.textContent : '').replace(/\s+/g, ' ').trim();
+    return (p ? p.textContent : '').trim();
   }
-
-  var activeEl = null;
-
-  function openItem(el) {
-    if (el.hasAttribute('tabindex')) {
-      el.click();
-    } else {
-      fire(el, 'pointerenter');
-    }
-    activeEl = el;
-  }
-
-  function closeItem(el) {
-    if (el.hasAttribute('tabindex')) {
-      if (isOpen(el)) el.click();
-    } else {
-      fire(el, 'pointerleave');
-    }
-    if (activeEl === el) activeEl = null;
-  }
-
-  // Tap outside any open dropdown → close it
-  document.addEventListener('touchend', function(e) {
-    if (activeEl && !activeEl.contains(e.target)) {
-      closeItem(activeEl);
-    }
-  }, {passive: true});
 
   function patchItem(el) {
     if (el._navFixed) return;
     el._navFixed = true;
-    el.classList.add('lyqx-nav-item');
-
     var moved = false;
     el.addEventListener('touchstart', function() { moved = false; }, {passive: true});
     el.addEventListener('touchmove',  function() { moved = true;  }, {passive: true});
     el.addEventListener('touchend', function(e) {
       if (moved) return;
       e.preventDefault();
-      var wasOpen = isOpen(el);
-      if (activeEl && activeEl !== el) {
-        closeItem(activeEl);
-      }
-      if (wasOpen) {
-        closeItem(el);
-      } else {
-        openItem(el);
-      }
+      el.click();
     }, {passive: false});
   }
 
-  // CSS order for reordering without moving DOM nodes (safe with Framer)
-  function reorder(nav) {
-    nav.querySelectorAll('[data-highlight="true"]').forEach(function(el) {
-      var idx = ORDER.indexOf(getText(el));
-      if (idx >= 0) el.style.order = String(idx);
-    });
-  }
-
   function processNav(nav) {
-    reorder(nav);
-    nav.querySelectorAll('[data-highlight="true"]').forEach(patchItem);
+    var items = Array.from(nav.querySelectorAll('[data-highlight="true"]'))
+      .filter(function(el) { return ORDER.indexOf(getText(el)) >= 0; });
+
+    // Reorder once — skip on subsequent Framer re-renders (dropdown open/close)
+    if (items.length >= 3 && !ordered) {
+      ordered = true;
+      items.sort(function(a, b) {
+        return ORDER.indexOf(getText(a)) - ORDER.indexOf(getText(b));
+      });
+      items.forEach(function(el) { nav.appendChild(el); });
+    }
+
+    items.forEach(patchItem);
   }
 
   new MutationObserver(function(muts) {
@@ -1046,10 +989,6 @@
         var nav = n.classList && n.classList.contains('framer-stp9rp') ? n
                 : n.querySelector ? n.querySelector('.framer-stp9rp') : null;
         if (nav) processNav(nav);
-        // Also patch any nav item added individually after the nav exists
-        if (n.dataset && n.dataset.highlight === 'true' && n.closest && n.closest('.framer-stp9rp')) {
-          patchItem(n);
-        }
       });
     });
   }).observe(document.body, {childList: true, subtree: true});
